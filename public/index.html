@@ -9,14 +9,6 @@
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
 
-    <link rel="preload" href="piano/lower_do.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/re.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/mi.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/fa.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/sol.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/la.wav" as="audio" type="audio/wav">
-    <link rel="preload" href="piano/si.mp3" as="audio" type="audio/mp3">
-    <link rel="preload" href="piano/higher_do.wav" as="audio" type="audio/wav">
 </head>
 <body>
 number of players: <span id="players"></span>
@@ -24,6 +16,10 @@ number of players: <span id="players"></span>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/howler.js"></script>
 <script>
+    var notes = {};
+
+    preloadHowler();
+
     var socket = io();
 
     socket.on('connect', function() {
@@ -36,60 +32,35 @@ number of players: <span id="players"></span>
     $(document).keydown(function(keyPressed) {
         switch (keyPressed.keyCode) {
             case 90:
-                new Howl({
-                    src: ['piano/lower_do.wav']
-                }).play();
-
+                activateHowl('lower_do');
                 socket.emit('keyPressed', {key: 'lower_do'});
                 break;
             case 88:
-                new Howl({
-                    src: ['piano/re.wav']
-                }).play();
-
+                activateHowl('re');
                 socket.emit('keyPressed', {key: 're'});
                 break;
             case 67:
-                new Howl({
-                    src: ['piano/mi.wav']
-                }).play();
-
+                activateHowl('mi');
                 socket.emit('keyPressed', {key: 'mi'});
                 break;
             case 86:
-                new Howl({
-                    src: ['piano/fa.wav']
-                }).play();
-
+                activateHowl('fa');
                 socket.emit('keyPressed', {key: 'fa'});
                 break;
             case 66:
-                new Howl({
-                    src: ['piano/sol.wav']
-                }).play();
-
+                activateHowl('sol');
                 socket.emit('keyPressed', {key: 'sol'});
                 break;
             case 78:
-                new Howl({
-                    src: ['piano/la.wav']
-                }).play();
-
+                activateHowl('la');
                 socket.emit('keyPressed', {key: 'la'});
                 break;
             case 77:
-                new Howl({
-                    src: ['piano/si.mp3'],
-                    volume: 0.2
-                }).play();
-
+                activateHowl('si');
                 socket.emit('keyPressed', {key: 'si'});
                 break;
             case 188:
-                new Howl({
-                    src: ['piano/higher_do.wav']
-                }).play();
-
+                activateHowl('higher_do');
                 socket.emit('keyPressed', {key: 'higher_do'});
                 break;
             default:
@@ -100,48 +71,82 @@ number of players: <span id="players"></span>
     socket.on('pressKey', function (key) {
         switch (key) {
             case 'lower_do':
-                new Howl({
-                    src: ['piano/lower_do.wav']
-                }).play();
+                activateHowl('lower_do');
                 break;
             case 're':
-                new Howl({
-                    src: ['piano/re.wav']
-                }).play();
+                activateHowl('re');
                 break;
             case 'mi':
-                new Howl({
-                    src: ['piano/mi.wav']
-                }).play();
+                activateHowl('mi');
                 break;
             case 'fa':
-                new Howl({
-                    src: ['piano/fa.wav']
-                }).play();
+                activateHowl('fa');
                 break;
             case 'sol':
-                new Howl({
-                    src: ['piano/sol.wav']
-                }).play();
+                activateHowl('sol');
                 break;
             case 'la':
-                new Howl({
-                    src: ['piano/la.wav']
-                }).play();
+                activateHowl('la');
                 break;
             case 'si':
-                new Howl({
-                    src: ['piano/si.mp3'],
-                    volume: 0.2
-                }).play();
+                activateHowl('si');
                 break;
             case 'higher_do':
-                new Howl({
-                    src: ['piano/higher_do.wav']
-                }).play();
+                activateHowl('higher_do');
                 break;
         }
-    })
+    });
+
+    function preloadHowler() {
+        var lower_do = new Howl({
+            src: [`piano/lower_do.wav`],
+            preload: true
+        });
+        var re = new Howl({
+            src: [`piano/re.wav`],
+            preload: true
+        });
+        var mi = new Howl({
+            src: [`piano/mi.wav`],
+            preload: true
+        });
+        var fa = new Howl({
+            src: [`piano/fa.wav`],
+            preload: true
+        });
+        var sol = new Howl({
+            src: [`piano/sol.wav`],
+            preload: true
+        });
+        var la = new Howl({
+            src: [`piano/la.wav`],
+            preload: true
+        });
+        var si = new Howl({
+            src: [`piano/si.mp3`],
+            volume: 0.2,
+            preload: true
+        });
+        var higher_do = new Howl({
+            src: [`piano/higher_do.wav`],
+            preload: true
+        });
+
+        notes = {
+            lower_do,
+            re,
+            mi,
+            fa,
+            sol,
+            la,
+            si,
+            higher_do
+        };
+    }
+
+    function activateHowl(key) {
+        notes[key].play();
+    }
 </script>
 </body>
 </html>
