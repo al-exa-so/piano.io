@@ -12,13 +12,23 @@
 </head>
 <body>
 number of players: <span id="players"></span>
+<br><br>
+drums: Q W E R T Y U I
+<br>
+saxophone: A S D F G H J K
+<br>
+piano: Z X C V B N M ,
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/howler.js"></script>
 <script>
-    var notes = {};
+    var piano_notes = {};
+    var sax_notes = {};
+    var drums = {};
 
-    preloadHowler();
+    preloadPianoHowler();
+    preloadSaxHowler();
+    preloadDrumsHowler();
 
     var socket = io();
 
@@ -31,73 +41,126 @@ number of players: <span id="players"></span>
 
     $(document).keydown(function(keyPressed) {
         switch (keyPressed.keyCode) {
+            //piano
             case 90:
-                activateHowl('lower_do');
-                socket.emit('keyPressed', {key: 'lower_do'});
+                activatePianoHowl('lower_do');
+                socket.emit('pianoKeyPressed', {key: 'lower_do'});
                 break;
             case 88:
-                activateHowl('re');
-                socket.emit('keyPressed', {key: 're'});
+                activatePianoHowl('re');
+                socket.emit('pianoKeyPressed', {key: 're'});
                 break;
             case 67:
-                activateHowl('mi');
-                socket.emit('keyPressed', {key: 'mi'});
+                activatePianoHowl('mi');
+                socket.emit('pianoKeyPressed', {key: 'mi'});
                 break;
             case 86:
-                activateHowl('fa');
-                socket.emit('keyPressed', {key: 'fa'});
+                activatePianoHowl('fa');
+                socket.emit('pianoKeyPressed', {key: 'fa'});
                 break;
             case 66:
-                activateHowl('sol');
-                socket.emit('keyPressed', {key: 'sol'});
+                activatePianoHowl('sol');
+                socket.emit('pianoKeyPressed', {key: 'sol'});
                 break;
             case 78:
-                activateHowl('la');
-                socket.emit('keyPressed', {key: 'la'});
+                activatePianoHowl('la');
+                socket.emit('pianoKeyPressed', {key: 'la'});
                 break;
             case 77:
-                activateHowl('si');
-                socket.emit('keyPressed', {key: 'si'});
+                activatePianoHowl('si');
+                socket.emit('pianoKeyPressed', {key: 'si'});
                 break;
             case 188:
-                activateHowl('higher_do');
-                socket.emit('keyPressed', {key: 'higher_do'});
+                activatePianoHowl('higher_do');
+                socket.emit('pianoKeyPressed', {key: 'higher_do'});
+                break;
+
+            //sax
+            case 65:
+                activateSaxHowl('lower_do');
+                socket.emit('saxKeyPressed', {key: 'lower_do'});
+                break;
+            case 83:
+                activateSaxHowl('re');
+                socket.emit('saxKeyPressed', {key: 're'});
+                break;
+            case 68:
+                activateSaxHowl('mi');
+                socket.emit('saxKeyPressed', {key: 'mi'});
+                break;
+            case 70:
+                activateSaxHowl('fa');
+                socket.emit('saxKeyPressed', {key: 'fa'});
+                break;
+            case 71:
+                activateSaxHowl('sol');
+                socket.emit('saxKeyPressed', {key: 'sol'});
+                break;
+            case 72:
+                activateSaxHowl('la');
+                socket.emit('saxKeyPressed', {key: 'la'});
+                break;
+            case 74:
+                activateSaxHowl('si');
+                socket.emit('saxKeyPressed', {key: 'si'});
+                break;
+            case 75:
+                activateSaxHowl('higher_do');
+                socket.emit('saxKeyPressed', {key: 'higher_do'});
+                break;
+
+
+            //drums
+            case 81:
+                activateDrumsHowl('bass');
+                socket.emit('drumKeyPressed', {drum: 'bass'});
+                break;
+            case 87:
+                activateDrumsHowl('snare');
+                socket.emit('drumKeyPressed', {drum: 'snare'});
+                break;
+            case 69:
+                activateDrumsHowl('hat_closed');
+                socket.emit('drumKeyPressed', {drum: 'hat_closed'});
+                break;
+            case 82:
+                activateDrumsHowl('hat_open');
+                socket.emit('drumKeyPressed', {drum: 'hat_open'});
+                break;
+            case 84:
+                activateDrumsHowl('crash');
+                socket.emit('drumKeyPressed', {drum: 'crash'});
+                break;
+            case 89:
+                activateDrumsHowl('tom3');
+                socket.emit('drumKeyPressed', {drum: 'tom3'});
+                break;
+            case 85:
+                activateDrumsHowl('tom2');
+                socket.emit('drumKeyPressed', {drum: 'tom2'});
+                break;
+            case 73:
+                activateDrumsHowl('tom1');
+                socket.emit('drumKeyPressed', {drum: 'tom1'});
                 break;
             default:
                 //nothing
         }
     });
 
-    socket.on('pressKey', function (key) {
-        switch (key) {
-            case 'lower_do':
-                activateHowl('lower_do');
-                break;
-            case 're':
-                activateHowl('re');
-                break;
-            case 'mi':
-                activateHowl('mi');
-                break;
-            case 'fa':
-                activateHowl('fa');
-                break;
-            case 'sol':
-                activateHowl('sol');
-                break;
-            case 'la':
-                activateHowl('la');
-                break;
-            case 'si':
-                activateHowl('si');
-                break;
-            case 'higher_do':
-                activateHowl('higher_do');
-                break;
-        }
+    socket.on('pressPianoKey', function (key) {
+        activatePianoHowl(key);
     });
 
-    function preloadHowler() {
+    socket.on('pressSaxKey', function (key) {
+        activateSaxHowl(key);
+    });
+
+    socket.on('pressDrumKey', function (drum) {
+        activateDrumsHowl(drum);
+    });
+
+    function preloadPianoHowler() {
         var lower_do = new Howl({
             src: [`piano/lower_do.wav`],
             preload: true
@@ -132,7 +195,7 @@ number of players: <span id="players"></span>
             preload: true
         });
 
-        notes = {
+        piano_notes = {
             lower_do,
             re,
             mi,
@@ -144,8 +207,108 @@ number of players: <span id="players"></span>
         };
     }
 
-    function activateHowl(key) {
-        notes[key].play();
+    function preloadSaxHowler() {
+        var lower_do = new Howl({
+            src: [`saxophone/lower_do.wav`],
+            preload: true
+        });
+        var re = new Howl({
+            src: [`saxophone/re.wav`],
+            preload: true
+        });
+        var mi = new Howl({
+            src: [`saxophone/mi.wav`],
+            preload: true
+        });
+        var fa = new Howl({
+            src: [`saxophone/fa.wav`],
+            preload: true
+        });
+        var sol = new Howl({
+            src: [`saxophone/sol.wav`],
+            preload: true
+        });
+        var la = new Howl({
+            src: [`saxophone/la.wav`],
+            preload: true
+        });
+        var si = new Howl({
+            src: [`saxophone/si.wav`],
+            preload: true
+        });
+        var higher_do = new Howl({
+            src: [`saxophone/higher_do.wav`],
+            preload: true
+        });
+
+        sax_notes = {
+            lower_do,
+            re,
+            mi,
+            fa,
+            sol,
+            la,
+            si,
+            higher_do
+        };
+    }
+
+    function preloadDrumsHowler() {
+        var bass = new Howl({
+            src: [`drums/bass.wav`],
+            preload: true
+        });
+        var snare = new Howl({
+            src: [`drums/snare.wav`],
+            preload: true
+        });
+        var hat_closed = new Howl({
+            src: [`drums/hat-closed.wav`],
+            preload: true
+        });
+        var hat_open = new Howl({
+            src: [`drums/hat-open.wav`],
+            preload: true
+        });
+        var crash = new Howl({
+            src: [`drums/crash.wav`],
+            preload: true
+        });
+        var tom1 = new Howl({
+            src: [`drums/tom1.wav`],
+            preload: true
+        });
+        var tom2 = new Howl({
+            src: [`drums/tom2.wav`],
+            preload: true
+        });
+        var tom3 = new Howl({
+            src: [`drums/tom3.wav`],
+            preload: true
+        });
+
+        drums = {
+            bass,
+            snare,
+            hat_closed,
+            hat_open,
+            crash,
+            tom1,
+            tom2,
+            tom3
+        };
+    }
+
+    function activatePianoHowl(key) {
+        piano_notes[key].play();
+    }
+    
+    function activateSaxHowl(key) {
+        sax_notes[key].play();
+    }
+
+    function activateDrumsHowl(drum) {
+        drums[drum].play();
     }
 </script>
 </body>

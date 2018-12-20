@@ -19,8 +19,16 @@ io.on('connection', (socket) => {
 
     io.emit('connectionsChanged', {connections: connected_users});
 
-    socket.on('keyPressed', (data, callback) => {
-        socket.broadcast.emit('pressKey', data.key);
+    socket.on('pianoKeyPressed', (data) => {
+        socket.broadcast.emit('pressPianoKey', data.key);
+    });
+
+    socket.on('saxKeyPressed', (data) => {
+        socket.broadcast.emit('pressSaxKey', data.key);
+    });
+
+    socket.on('drumKeyPressed', (data) => {
+        socket.broadcast.emit('pressDrumKey', data.drum);
     });
 
     socket.on('disconnect', () => {
