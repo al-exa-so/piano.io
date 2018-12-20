@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+number of players: <span id="players"></span>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/howler.js"></script>
+<script>
+    var socket = io();
+
+    socket.on('connect', function() {
+        socket.on('connectionsChanged', function(data) {
+            console.log(data);
+            $("#players").html(data.connections);
+        });
+    });
+
+    $(document).keydown(function(keyPressed) {
+        switch (keyPressed.keyCode) {
+            case 90:
+                new Howl({
+                    src: ['piano/lower_do.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'lower_do'});
+                break;
+            case 88:
+                new Howl({
+                    src: ['piano/re.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 're'});
+                break;
+            case 67:
+                new Howl({
+                    src: ['piano/mi.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'mi'});
+                break;
+            case 86:
+                new Howl({
+                    src: ['piano/fa.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'fa'});
+                break;
+            case 66:
+                new Howl({
+                    src: ['piano/sol.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'sol'});
+                break;
+            case 78:
+                new Howl({
+                    src: ['piano/la.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'la'});
+                break;
+            case 77:
+                new Howl({
+                    src: ['piano/si.mp3'],
+                    volume: 0.2
+                }).play();
+
+                socket.emit('keyPressed', {key: 'si'});
+                break;
+            case 188:
+                new Howl({
+                    src: ['piano/higher_do.wav']
+                }).play();
+
+                socket.emit('keyPressed', {key: 'higher_do'});
+                break;
+            default:
+                //nothing
+        }
+    });
+
+    socket.on('pressKey', function (key) {
+        switch (key) {
+            case 'lower_do':
+                new Howl({
+                    src: ['piano/lower_do.wav']
+                }).play();
+                break;
+            case 're':
+                new Howl({
+                    src: ['piano/re.wav']
+                }).play();
+                break;
+            case 'mi':
+                new Howl({
+                    src: ['piano/mi.wav']
+                }).play();
+                break;
+            case 'fa':
+                new Howl({
+                    src: ['piano/fa.wav']
+                }).play();
+                break;
+            case 'sol':
+                new Howl({
+                    src: ['piano/sol.wav']
+                }).play();
+                break;
+            case 'la':
+                new Howl({
+                    src: ['piano/la.wav']
+                }).play();
+                break;
+            case 'si':
+                new Howl({
+                    src: ['piano/si.mp3'],
+                    volume: 0.2
+                }).play();
+                break;
+            case 'higher_do':
+                new Howl({
+                    src: ['piano/higher_id.wav']
+                }).play();
+                break;
+        }
+    })
+</script>
+</body>
+</html>
