@@ -9,15 +9,40 @@
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
 
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
 number of players: <span id="players"></span>
 <br><br>
-drums: Q W E R T Y U I
-<br>
-saxophone: A S D F G H J K
-<br>
-piano: Z X C V B N M ,
+drums:
+<div class="d-inline" id="q" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; Q &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="w" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; W &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="e" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; E &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="r" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; R &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="t" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; T &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="y" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; Y &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="u" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; U &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="i" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; I &nbsp;&nbsp;&nbsp;</div>
+<br><br>
+saxophone:
+<div class="d-inline" id="a" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; A &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="s" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; S &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="d" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; D &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="f" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; F &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="g" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; G &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="h" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; H &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="j" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; J &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="k" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; K &nbsp;&nbsp;&nbsp;</div>
+<br><br>
+piano:
+<div class="d-inline" id="z" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; Z &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="x" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; X &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="c" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; C &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="v" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; V &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="b" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; B &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="n" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; N &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="m" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; M &nbsp;&nbsp;&nbsp;</div>
+<div class="d-inline" id="higher_do" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; , &nbsp;&nbsp;&nbsp;</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/howler.js"></script>
@@ -25,6 +50,7 @@ piano: Z X C V B N M ,
     var piano_notes = {};
     var sax_notes = {};
     var drums = {};
+    var myColor;
 
     preloadPianoHowler();
     preloadSaxHowler();
@@ -34,9 +60,12 @@ piano: Z X C V B N M ,
 
     socket.on('connect', function() {
         socket.on('connectionsChanged', function(data) {
-            console.log(data);
             $("#players").html(data.connections);
         });
+
+        socket.on('setColor', function (data) {
+            myColor = data.color;
+        })
     });
 
     $(document).keydown(function(keyPressed) {
@@ -44,120 +73,147 @@ piano: Z X C V B N M ,
             //piano
             case 90:
                 activatePianoHowl('lower_do');
-                socket.emit('pianoKeyPressed', {key: 'lower_do'});
+                colorDiv('z', myColor);
+                socket.emit('pianoKeyPressed', {key: 'lower_do', divid: 'z'});
                 break;
             case 88:
                 activatePianoHowl('re');
-                socket.emit('pianoKeyPressed', {key: 're'});
+                colorDiv('x', myColor);
+                socket.emit('pianoKeyPressed', {key: 're', divid: 'x'});
                 break;
             case 67:
                 activatePianoHowl('mi');
-                socket.emit('pianoKeyPressed', {key: 'mi'});
+                colorDiv('c', myColor);
+                socket.emit('pianoKeyPressed', {key: 'mi', divid: 'c'});
                 break;
             case 86:
                 activatePianoHowl('fa');
-                socket.emit('pianoKeyPressed', {key: 'fa'});
+                colorDiv('v', myColor);
+                socket.emit('pianoKeyPressed', {key: 'fa', divid: 'v'});
                 break;
             case 66:
                 activatePianoHowl('sol');
-                socket.emit('pianoKeyPressed', {key: 'sol'});
+                colorDiv('b', myColor);
+                socket.emit('pianoKeyPressed', {key: 'sol', divid: 'b'});
                 break;
             case 78:
                 activatePianoHowl('la');
-                socket.emit('pianoKeyPressed', {key: 'la'});
+                colorDiv('n', myColor);
+                socket.emit('pianoKeyPressed', {key: 'la', divid: 'n'});
                 break;
             case 77:
                 activatePianoHowl('si');
-                socket.emit('pianoKeyPressed', {key: 'si'});
+                colorDiv('m', myColor);
+                socket.emit('pianoKeyPressed', {key: 'si', divid: 'm'});
                 break;
             case 188:
                 activatePianoHowl('higher_do');
-                socket.emit('pianoKeyPressed', {key: 'higher_do'});
+                colorDiv('higher_do', myColor);
+                socket.emit('pianoKeyPressed', {key: 'higher_do', divid: 'higher_do'});
                 break;
 
             //sax
             case 65:
                 activateSaxHowl('lower_do');
-                socket.emit('saxKeyPressed', {key: 'lower_do'});
+                colorDiv('a', myColor);
+                socket.emit('saxKeyPressed', {key: 'lower_do', divid: 'a'});
                 break;
             case 83:
                 activateSaxHowl('re');
-                socket.emit('saxKeyPressed', {key: 're'});
+                colorDiv('s', myColor);
+                socket.emit('saxKeyPressed', {key: 're', divid: 's'});
                 break;
             case 68:
                 activateSaxHowl('mi');
-                socket.emit('saxKeyPressed', {key: 'mi'});
+                colorDiv('d', myColor);
+                socket.emit('saxKeyPressed', {key: 'mi', divid: 'd'});
                 break;
             case 70:
                 activateSaxHowl('fa');
-                socket.emit('saxKeyPressed', {key: 'fa'});
+                colorDiv('f', myColor);
+                socket.emit('saxKeyPressed', {key: 'fa', divid: 'f'});
                 break;
             case 71:
                 activateSaxHowl('sol');
-                socket.emit('saxKeyPressed', {key: 'sol'});
+                colorDiv('g', myColor);
+                socket.emit('saxKeyPressed', {key: 'sol', divid: 'g'});
                 break;
             case 72:
                 activateSaxHowl('la');
-                socket.emit('saxKeyPressed', {key: 'la'});
+                colorDiv('h', myColor);
+                socket.emit('saxKeyPressed', {key: 'la', divid: 'h'});
                 break;
             case 74:
                 activateSaxHowl('si');
-                socket.emit('saxKeyPressed', {key: 'si'});
+                colorDiv('j', myColor);
+                socket.emit('saxKeyPressed', {key: 'si', divid: 'j'});
                 break;
             case 75:
                 activateSaxHowl('higher_do');
-                socket.emit('saxKeyPressed', {key: 'higher_do'});
+                colorDiv('k', myColor);
+                socket.emit('saxKeyPressed', {key: 'higher_do', divid: 'k'});
                 break;
 
 
             //drums
             case 81:
                 activateDrumsHowl('bass');
-                socket.emit('drumKeyPressed', {drum: 'bass'});
+                colorDiv('q', myColor);
+                socket.emit('drumKeyPressed', {drum: 'bass', divid: 'q'});
                 break;
             case 87:
                 activateDrumsHowl('snare');
-                socket.emit('drumKeyPressed', {drum: 'snare'});
+                colorDiv('w', myColor);
+                socket.emit('drumKeyPressed', {drum: 'snare', divid: 'w'});
                 break;
             case 69:
                 activateDrumsHowl('hat_closed');
-                socket.emit('drumKeyPressed', {drum: 'hat_closed'});
+                colorDiv('e', myColor);
+                socket.emit('drumKeyPressed', {drum: 'hat_closed', divid: 'e'});
                 break;
             case 82:
                 activateDrumsHowl('hat_open');
-                socket.emit('drumKeyPressed', {drum: 'hat_open'});
+                colorDiv('r', myColor);
+                socket.emit('drumKeyPressed', {drum: 'hat_open', divid: 'r'});
                 break;
             case 84:
                 activateDrumsHowl('crash');
-                socket.emit('drumKeyPressed', {drum: 'crash'});
+                colorDiv('t', myColor);
+                socket.emit('drumKeyPressed', {drum: 'crash', divid: 't'});
                 break;
             case 89:
                 activateDrumsHowl('tom3');
-                socket.emit('drumKeyPressed', {drum: 'tom3'});
+                colorDiv('y', myColor);
+                socket.emit('drumKeyPressed', {drum: 'tom3', divid: 'y'});
                 break;
             case 85:
                 activateDrumsHowl('tom2');
-                socket.emit('drumKeyPressed', {drum: 'tom2'});
+                colorDiv('u', myColor);
+                socket.emit('drumKeyPressed', {drum: 'tom2', divid: 'u'});
                 break;
             case 73:
                 activateDrumsHowl('tom1');
-                socket.emit('drumKeyPressed', {drum: 'tom1'});
+                colorDiv('i', myColor);
+                socket.emit('drumKeyPressed', {drum: 'tom1', divid: 'i'});
                 break;
             default:
                 //nothing
         }
     });
 
-    socket.on('pressPianoKey', function (key) {
-        activatePianoHowl(key);
+    socket.on('pressPianoKey', function (data) {
+        activatePianoHowl(data.key);
+        colorDiv(data.divid, data.color);
     });
 
-    socket.on('pressSaxKey', function (key) {
-        activateSaxHowl(key);
+    socket.on('pressSaxKey', function (data) {
+        activateSaxHowl(data.key);
+        colorDiv(data.divid, data.color);
     });
 
-    socket.on('pressDrumKey', function (drum) {
-        activateDrumsHowl(drum);
+    socket.on('pressDrumKey', function (data) {
+        activateDrumsHowl(data.drum);
+        colorDiv(data.divid, data.color);
     });
 
     function preloadPianoHowler() {
@@ -309,6 +365,14 @@ piano: Z X C V B N M ,
 
     function activateDrumsHowl(drum) {
         drums[drum].play();
+    }
+
+    function colorDiv(divId, color) {
+        $(`#${divId}`).css('background-color', `#${color}`);
+
+        setTimeout(function () {
+            $(`#${divId}`).css('background-color', 'white');
+        }, 100);
     }
 </script>
 </body>

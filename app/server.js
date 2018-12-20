@@ -1,5 +1,6 @@
 const path = require('path');
 const http = require('http');
+const axios = require('axios');
 const express = require('express');
 const socketIO = require('socket.io');
 
@@ -14,24 +15,33 @@ app.use(express.static(publicPath));
 
 var connected_users = 0;
 
-io.on('connection', (socket) => {
+var userColors = [];
+
+io.on('connection', async (socket) => {
+    var getColor = await axios.get('http://www.colr.org/json/color/random');
+    userColors[socket.id] = getColor.data.colors[0].hex;
+
+    console.log(userColors);
+
     connected_users++;
 
     io.emit('connectionsChanged', {connections: connected_users});
+    socket.emit('setColor', {color: userColors[socket.id]});
 
     socket.on('pianoKeyPressed', (data) => {
-        socket.broadcast.emit('pressPianoKey', data.key);
+        socket.broadcast.emit('pressPianoKey', {key: data.key, divid: data.divid, color: userColors[socket.id]});
     });
 
     socket.on('saxKeyPressed', (data) => {
-        socket.broadcast.emit('pressSaxKey', data.key);
+        socket.broadcast.emit('pressSaxKey', {key: data.key, divid: data.divid, color: userColors[socket.id]});
     });
 
     socket.on('drumKeyPressed', (data) => {
-        socket.broadcast.emit('pressDrumKey', data.drum);
+        socket.broadcast.emit('pressDrumKey', {drum: data.drum, divid: data.divid, color: userColors[socket.id]});
     });
 
     socket.on('disconnect', () => {
+        delete userColors[socket.id];
         connected_users--;
         io.emit('connectionsChanged', {connections: connected_users});
     });
