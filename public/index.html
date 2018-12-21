@@ -12,7 +12,8 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-number of players: <span id="players"></span>
+number of players: <span id="players"></span> | Volume:
+<button id="lowerVolume">-</button><input id="volume" type="number" value="1" disabled><button id="higherVolume">+</button>
 <br><br>
 drums:
 <div class="d-inline" id="q" style="border: 2px solid dimgrey">&nbsp;&nbsp;&nbsp; Q &nbsp;&nbsp;&nbsp;</div>
@@ -51,12 +52,30 @@ piano:
     var sax_notes = {};
     var drums = {};
     var myColor;
+    var volume = 1;
 
     preloadPianoHowler();
     preloadSaxHowler();
     preloadDrumsHowler();
 
     var socket = io();
+
+    var volumeInput = $("#volume");
+    $("#lowerVolume").on('click', function () {
+        if(parseFloat(volumeInput.val()) > 0.1) {
+            let newVolume = Math.round((parseFloat(volumeInput.val()) - 0.1) * 10 ) / 10;
+            volumeInput.val(newVolume);
+            volume = newVolume;
+        }
+    });
+
+    $("#higherVolume").on('click', function () {
+        if(parseFloat(volumeInput.val()) < 1) {
+            let newVolume = Math.round((parseFloat(volumeInput.val()) + 0.1) * 10 ) / 10;
+            volumeInput.val(newVolume);
+            volume = newVolume;
+        }
+    });
 
     socket.on('connect', function() {
         socket.on('connectionsChanged', function(data) {
@@ -68,136 +87,53 @@ piano:
         })
     });
 
+    var keysArray = {
+        90: {type: 'piano', key: 'lower_do', divid: 'z'},
+        88: {type: 'piano', key: 're', divid: 'x'},
+        67: {type: 'piano', key: 'mi', divid: 'c'},
+        86: {type: 'piano', key: 'fa', divid: 'v'},
+        66: {type: 'piano', key: 'sol', divid: 'b'},
+        78: {type: 'piano', key: 'la', divid: 'n'},
+        77: {type: 'piano', key: 'si', divid: 'm'},
+        188: {type: 'piano', key: 'higher_do', divid: 'higher_do'},
+        65: {type: 'sax', key: 'lower_do', divid: 'a'},
+        83: {type: 'sax', key: 're', divid: 's'},
+        68: {type: 'sax', key: 'mi', divid: 'd'},
+        70: {type: 'sax', key: 'fa', divid: 'f'},
+        71: {type: 'sax', key: 'sol', divid: 'g'},
+        72: {type: 'sax', key: 'la', divid: 'h'},
+        74: {type: 'sax', key: 'si', divid: 'j'},
+        75: {type: 'sax', key: 'higher_do', divid: 'k'},
+        81: {type: 'drums', key: 'bass', divid: 'q'},
+        87: {type: 'drums', key: 'snare', divid: 'w'},
+        69: {type: 'drums', key: 'hat_closed', divid: 'e'},
+        82: {type: 'drums', key: 'hat_open', divid: 'r'},
+        84: {type: 'drums', key: 'crash', divid: 't'},
+        89: {type: 'drums', key: 'tom3', divid: 'y'},
+        85: {type: 'drums', key: 'tom2', divid: 'u'},
+        73: {type: 'drums', key: 'tom1', divid: 'i'},
+    };
+
     $(document).keydown(function(keyPressed) {
-        switch (keyPressed.keyCode) {
-            //piano
-            case 90:
-                activatePianoHowl('lower_do');
-                colorDiv('z', myColor);
-                socket.emit('pianoKeyPressed', {key: 'lower_do', divid: 'z'});
-                break;
-            case 88:
-                activatePianoHowl('re');
-                colorDiv('x', myColor);
-                socket.emit('pianoKeyPressed', {key: 're', divid: 'x'});
-                break;
-            case 67:
-                activatePianoHowl('mi');
-                colorDiv('c', myColor);
-                socket.emit('pianoKeyPressed', {key: 'mi', divid: 'c'});
-                break;
-            case 86:
-                activatePianoHowl('fa');
-                colorDiv('v', myColor);
-                socket.emit('pianoKeyPressed', {key: 'fa', divid: 'v'});
-                break;
-            case 66:
-                activatePianoHowl('sol');
-                colorDiv('b', myColor);
-                socket.emit('pianoKeyPressed', {key: 'sol', divid: 'b'});
-                break;
-            case 78:
-                activatePianoHowl('la');
-                colorDiv('n', myColor);
-                socket.emit('pianoKeyPressed', {key: 'la', divid: 'n'});
-                break;
-            case 77:
-                activatePianoHowl('si');
-                colorDiv('m', myColor);
-                socket.emit('pianoKeyPressed', {key: 'si', divid: 'm'});
-                break;
-            case 188:
-                activatePianoHowl('higher_do');
-                colorDiv('higher_do', myColor);
-                socket.emit('pianoKeyPressed', {key: 'higher_do', divid: 'higher_do'});
-                break;
+        if(keysArray[keyPressed.keyCode]) {
+            switch (keysArray[keyPressed.keyCode].type) {
+                case 'piano':
+                    activatePianoHowl(keysArray[keyPressed.keyCode].key);
+                    socket.emit('pianoKeyPressed', {key: keysArray[keyPressed.keyCode].key, divid: keysArray[keyPressed.keyCode].divid});
+                    break;
+                case 'sax':
+                    activateSaxHowl(keysArray[keyPressed.keyCode].key);
+                    socket.emit('saxKeyPressed', {key: keysArray[keyPressed.keyCode].key, divid: keysArray[keyPressed.keyCode].divid});
+                    break;
+                case 'drums':
+                    activateDrumsHowl(keysArray[keyPressed.keyCode].key);
+                    socket.emit('drumKeyPressed', {key: keysArray[keyPressed.keyCode].key, divid: keysArray[keyPressed.keyCode].divid});
+                    break;
+                default:
 
-            //sax
-            case 65:
-                activateSaxHowl('lower_do');
-                colorDiv('a', myColor);
-                socket.emit('saxKeyPressed', {key: 'lower_do', divid: 'a'});
-                break;
-            case 83:
-                activateSaxHowl('re');
-                colorDiv('s', myColor);
-                socket.emit('saxKeyPressed', {key: 're', divid: 's'});
-                break;
-            case 68:
-                activateSaxHowl('mi');
-                colorDiv('d', myColor);
-                socket.emit('saxKeyPressed', {key: 'mi', divid: 'd'});
-                break;
-            case 70:
-                activateSaxHowl('fa');
-                colorDiv('f', myColor);
-                socket.emit('saxKeyPressed', {key: 'fa', divid: 'f'});
-                break;
-            case 71:
-                activateSaxHowl('sol');
-                colorDiv('g', myColor);
-                socket.emit('saxKeyPressed', {key: 'sol', divid: 'g'});
-                break;
-            case 72:
-                activateSaxHowl('la');
-                colorDiv('h', myColor);
-                socket.emit('saxKeyPressed', {key: 'la', divid: 'h'});
-                break;
-            case 74:
-                activateSaxHowl('si');
-                colorDiv('j', myColor);
-                socket.emit('saxKeyPressed', {key: 'si', divid: 'j'});
-                break;
-            case 75:
-                activateSaxHowl('higher_do');
-                colorDiv('k', myColor);
-                socket.emit('saxKeyPressed', {key: 'higher_do', divid: 'k'});
-                break;
+            }
 
-
-            //drums
-            case 81:
-                activateDrumsHowl('bass');
-                colorDiv('q', myColor);
-                socket.emit('drumKeyPressed', {drum: 'bass', divid: 'q'});
-                break;
-            case 87:
-                activateDrumsHowl('snare');
-                colorDiv('w', myColor);
-                socket.emit('drumKeyPressed', {drum: 'snare', divid: 'w'});
-                break;
-            case 69:
-                activateDrumsHowl('hat_closed');
-                colorDiv('e', myColor);
-                socket.emit('drumKeyPressed', {drum: 'hat_closed', divid: 'e'});
-                break;
-            case 82:
-                activateDrumsHowl('hat_open');
-                colorDiv('r', myColor);
-                socket.emit('drumKeyPressed', {drum: 'hat_open', divid: 'r'});
-                break;
-            case 84:
-                activateDrumsHowl('crash');
-                colorDiv('t', myColor);
-                socket.emit('drumKeyPressed', {drum: 'crash', divid: 't'});
-                break;
-            case 89:
-                activateDrumsHowl('tom3');
-                colorDiv('y', myColor);
-                socket.emit('drumKeyPressed', {drum: 'tom3', divid: 'y'});
-                break;
-            case 85:
-                activateDrumsHowl('tom2');
-                colorDiv('u', myColor);
-                socket.emit('drumKeyPressed', {drum: 'tom2', divid: 'u'});
-                break;
-            case 73:
-                activateDrumsHowl('tom1');
-                colorDiv('i', myColor);
-                socket.emit('drumKeyPressed', {drum: 'tom1', divid: 'i'});
-                break;
-            default:
-                //nothing
+            colorDiv(keysArray[keyPressed.keyCode].divid, myColor);
         }
     });
 
@@ -212,7 +148,7 @@ piano:
     });
 
     socket.on('pressDrumKey', function (data) {
-        activateDrumsHowl(data.drum);
+        activateDrumsHowl(data.key);
         colorDiv(data.divid, data.color);
     });
 
@@ -242,8 +178,7 @@ piano:
             preload: true
         });
         var si = new Howl({
-            src: [`piano/si.mp3`],
-            volume: 0.2,
+            src: [`piano/si.wav`],
             preload: true
         });
         var higher_do = new Howl({
@@ -356,15 +291,15 @@ piano:
     }
 
     function activatePianoHowl(key) {
-        piano_notes[key].play();
+        piano_notes[key].volume(volume).play();
     }
     
     function activateSaxHowl(key) {
-        sax_notes[key].play();
+        sax_notes[key].volume(volume).play();
     }
 
     function activateDrumsHowl(drum) {
-        drums[drum].play();
+        drums[drum].volume(volume).play();
     }
 
     function colorDiv(divId, color) {

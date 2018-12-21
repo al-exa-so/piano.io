@@ -37,7 +37,7 @@ io.on('connection', async (socket) => {
     });
 
     socket.on('drumKeyPressed', (data) => {
-        socket.broadcast.emit('pressDrumKey', {drum: data.drum, divid: data.divid, color: userColors[socket.id]});
+        socket.broadcast.emit('pressDrumKey', {key: data.key, divid: data.divid, color: userColors[socket.id]});
     });
 
     socket.on('disconnect', () => {
